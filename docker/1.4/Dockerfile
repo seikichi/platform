@@ -15,8 +15,8 @@ RUN groupadd -r mysql && useradd -r -g mysql mysql
 
 RUN apt-key adv --keyserver pool.sks-keyservers.net --recv-keys A4A9406876FCBD3C456770C88C718D3B5072E1F5
 
-ENV MYSQL_MAJOR 5.6
-ENV MYSQL_VERSION 5.6.25
+ENV MYSQL_MAJOR 5.7
+ENV MYSQL_VERSION 5.7.12
 
 RUN echo "deb http://repo.mysql.com/apt/debian/ wheezy mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
 

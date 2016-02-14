@@ -38,7 +38,7 @@ if [ ! -d "$DATADIR/mysql" ]; then
 	chown -R mysql:mysql "$DATADIR"
 
 	echo 'Running mysql_install_db'
-	mysql_install_db --user=mysql --datadir="$DATADIR" --rpm --keep-my-cnf
+	mysqld --initialize-insecure --user=mysql --datadir="$DATADIR"
 	echo 'Finished mysql_install_db'
 
 	mysqld --user=mysql --datadir="$DATADIR" --skip-networking &
@@ -108,4 +108,17 @@ sleep 5
 
 echo starting platform
 cd /mattermost/bin
+
+# Enable cjk search ;-p
+# Run `platform` to create tables
+./platform -config=/config_docker.json &
+sleep 5
+pkill platform
+# Use ngram parser (see: https://github.com/mattermost/platform/issues/2033)
+mysql -uroot -p$MYSQL_PASSWORD <<-EOSQL
+USE ${MYSQL_DATABASE};
+DROP INDEX idx_posts_message_txt ON Posts;
+CREATE FULLTEXT INDEX idx_posts_message_txt ON Posts (Message) WITH PARSER ngram;
+EOSQL
+
 ./platform -config=/config_docker.json
